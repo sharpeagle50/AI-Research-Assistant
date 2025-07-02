@@ -71,6 +71,23 @@ const usageTracking = new Map(); // Track daily usage
 
 // Routes
 
+// Root route - API information
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Research Assistant Pro API',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/health',
+      verifySubscription: '/api/verify-subscription',
+      redeemCode: '/api/redeem-code',
+      aiRequest: '/api/ai-request'
+    },
+    documentation: 'https://github.com/your-repo/AI-Research-Assistant',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
