@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Research Assistant Response</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .ra-response {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+            position: relative;
+        }
+        
+        .ra-response::before {
+            content: "🤖 Research Assistant";
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .ra-content {
+            color: #212529;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .ra-edit-suggestion {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        
+        .ra-edit-header {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .ra-edit-original {
+            background: #f8d7da;
+            border-left: 3px solid #dc3545;
+            padding: 8px;
+            margin: 6px 0;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+        
+        .ra-edit-modified {
+            background: #d4edda;
+            border-left: 3px solid #28a745;
+            padding: 8px;
+            margin: 6px 0;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+        
+        .ra-edit-actions {
+            margin-top: 8px;
+            text-align: right;
+        }
+        
+        .ra-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-left: 4px;
+        }
+        
+        .ra-button:hover {
+            background: #0056b3;
+        }
+        
+        .ra-button.secondary {
+            background: #6c757d;
+        }
+        
+        .ra-button.secondary:hover {
+            background: #545b62;
+        }
+        
+        .ra-timestamp {
+            font-size: 10px;
+            color: #6c757d;
+            margin-top: 8px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="ra-response">
+        <div class="ra-content" id="response-content">
+            <!-- AI response content will be inserted here -->
+        </div>
+        
+        <div class="ra-edit-suggestion" id="edit-suggestion" style="display: none;">
+            <div class="ra-edit-header">Suggested Edit:</div>
+            <div class="ra-edit-original" id="edit-original">
+                <!-- Original text -->
+            </div>
+            <div class="ra-edit-modified" id="edit-modified">
+                <!-- Modified text -->
+            </div>
+            <div class="ra-edit-actions">
+                <button class="ra-button secondary" onclick="dismissEdit()">Dismiss</button>
+                <button class="ra-button" onclick="applyEdit()">Apply Edit</button>
+            </div>
+        </div>
+        
+        <div class="ra-timestamp" id="timestamp">
+            <!-- Timestamp will be inserted here -->
+        </div>
+    </div>
+    
+    <script>
+        function applyEdit() {
+            // This will be handled by the content script
+            window.parent.postMessage({
+                type: 'ra-apply-edit',
+                editId: window.editId,
+                original: document.getElementById('edit-original').textContent,
+                modified: document.getElementById('edit-modified').textContent
+            }, '*');
+        }
+        
+        function dismissEdit() {
+            document.getElementById('edit-suggestion').style.display = 'none';
+        }
+        
+        // Set timestamp when loaded
+        document.getElementById('timestamp').textContent = new Date().toLocaleTimeString();
+    </script>
+</body>
+</html> 

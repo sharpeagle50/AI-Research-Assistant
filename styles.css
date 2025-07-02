@@ -1,0 +1,36 @@
+/* Styles for Research Assistant Chrome Extension */
+
+.research-assistant-highlight {
+  background-color: rgba(255, 235, 59, 0.3);
+  border-radius: 2px;
+  padding: 1px 2px;
+}
+
+.research-assistant-popup {
+  position: fixed;
+  z-index: 10000;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  max-width: 300px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.research-assistant-button {
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  margin: 4px 2px;
+}
+
+.research-assistant-button:hover {
+  background: #5a67d8;
+} 

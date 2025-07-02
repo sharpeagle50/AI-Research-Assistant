@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>LaTeX Edit Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 12px;
+            background: #ffffff;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .edit-preview-container {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .edit-preview-header {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            color: #495057;
+            font-size: 12px;
+        }
+        
+        .edit-preview-content {
+            padding: 0;
+        }
+        
+        .diff-section {
+            margin: 0;
+        }
+        
+        .diff-section-header {
+            background: #f1f3f4;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #5f6368;
+            border-bottom: 1px solid #e8eaed;
+        }
+        
+        .diff-line {
+            padding: 4px 12px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border-left: 3px solid transparent;
+        }
+        
+        .diff-removed {
+            background: #ffeef0;
+            border-left-color: #f85149;
+            color: #82071e;
+        }
+        
+        .diff-removed::before {
+            content: "- ";
+            color: #f85149;
+            font-weight: bold;
+        }
+        
+        .diff-added {
+            background: #f0fff4;
+            border-left-color: #3fb950;
+            color: #1a7f37;
+        }
+        
+        .diff-added::before {
+            content: "+ ";
+            color: #3fb950;
+            font-weight: bold;
+        }
+        
+        .diff-context {
+            background: #f8f9fa;
+            color: #656d76;
+        }
+        
+        .diff-context::before {
+            content: "  ";
+        }
+        
+        .latex-command {
+            color: #0969da;
+            font-weight: 500;
+        }
+        
+        .latex-environment {
+            color: #8250df;
+            font-weight: 500;
+        }
+        
+        .latex-comment {
+            color: #656d76;
+            font-style: italic;
+        }
+        
+        .preview-actions {
+            padding: 12px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            text-align: right;
+        }
+        
+        .preview-button {
+            background: #0969da;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 6px;
+        }
+        
+        .preview-button:hover {
+            background: #0860ca;
+        }
+        
+        .preview-button.secondary {
+            background: #6c757d;
+        }
+        
+        .preview-button.secondary:hover {
+            background: #545b62;
+        }
+        
+        .preview-stats {
+            font-size: 11px;
+            color: #656d76;
+            margin-bottom: 8px;
+        }
+        
+        .stats-item {
+            display: inline-block;
+            margin-right: 12px;
+        }
+        
+        .stats-added {
+            color: #1a7f37;
+        }
+        
+        .stats-removed {
+            color: #cf222e;
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-preview-container">
+        <div class="edit-preview-header">
+            📝 LaTeX Edit Preview
+        </div>
+        
+        <div class="edit-preview-content">
+            <div class="preview-stats" id="preview-stats">
+                <span class="stats-item stats-added">+<span id="lines-added">0</span> added</span>
+                <span class="stats-item stats-removed">-<span id="lines-removed">0</span> removed</span>
+            </div>
+            
+            <div class="diff-section">
+                <div class="diff-section-header">Changes</div>
+                <div id="diff-content">
+                    <!-- Diff content will be inserted here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="preview-actions">
+            <button class="preview-button secondary" onclick="closePreview()">Close</button>
+            <button class="preview-button" onclick="acceptEdit()">Accept Changes</button>
+        </div>
+    </div>
+    
+    <script>
+        function highlightLatex(text) {
+            // Basic LaTeX syntax highlighting
+            return text
+                .replace(/\\[a-zA-Z]+\*?/g, '<span class="latex-command">$&</span>')
+                .replace(/\\(begin|end)\{[^}]+\}/g, '<span class="latex-environment">$&</span>')
+                .replace(/%.*$/gm, '<span class="latex-comment">$&</span>');
+        }
+        
+        function generateDiff(original, modified) {
+            const originalLines = original.split('\n');
+            const modifiedLines = modified.split('\n');
+            
+            let diffHtml = '';
+            let addedCount = 0;
+            let removedCount = 0;
+            
+            // Simple line-by-line diff (could be enhanced with proper diff algorithm)
+            const maxLines = Math.max(originalLines.length, modifiedLines.length);
+            
+            for (let i = 0; i < maxLines; i++) {
+                const origLine = originalLines[i] || '';
+                const modLine = modifiedLines[i] || '';
+                
+                if (origLine !== modLine) {
+                    if (origLine && !modLine) {
+                        // Line removed
+                        diffHtml += `<div class="diff-line diff-removed">${highlightLatex(origLine)}</div>`;
+                        removedCount++;
+                    } else if (!origLine && modLine) {
+                        // Line added
+                        diffHtml += `<div class="diff-line diff-added">${highlightLatex(modLine)}</div>`;
+                        addedCount++;
+                    } else {
+                        // Line modified
+                        diffHtml += `<div class="diff-line diff-removed">${highlightLatex(origLine)}</div>`;
+                        diffHtml += `<div class="diff-line diff-added">${highlightLatex(modLine)}</div>`;
+                        removedCount++;
+                        addedCount++;
+                    }
+                } else if (origLine) {
+                    // Context line (unchanged)
+                    diffHtml += `<div class="diff-line diff-context">${highlightLatex(origLine)}</div>`;
+                }
+            }
+            
+            document.getElementById('diff-content').innerHTML = diffHtml;
+            document.getElementById('lines-added').textContent = addedCount;
+            document.getElementById('lines-removed').textContent = removedCount;
+        }
+        
+        function acceptEdit() {
+            window.parent.postMessage({
+                type: 'ra-accept-edit-preview',
+                action: 'accept'
+            }, '*');
+        }
+        
+        function closePreview() {
+            window.parent.postMessage({
+                type: 'ra-accept-edit-preview',
+                action: 'close'
+            }, '*');
+        }
+        
+        // Listen for data from parent
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'ra-load-edit-preview') {
+                generateDiff(event.data.original, event.data.modified);
+            }
+        });
+    </script>
+</body>
+</html> 
